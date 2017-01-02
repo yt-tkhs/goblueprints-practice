@@ -3,8 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat</title>
+    <style>
+        input { display: block; }
+        ul { list-stlye: none; }
+    </style>
 </head>
 <body>
-    Let's chat! (from template/index.html)
+    <ul id="messages"></ul>
+    Chat app using WebSocket
+    <form id="chatbox">
+        <textarea></textarea>
+        <input type="submit" id="submit_btn" value="Send" />
+    </form>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            var socket = null;
+            var msgBox = $("#chatbox textarea");
+            var messages = $("#messages");
+
+            $("#test_btn").click(function() {
+                console.log("test");
+            });
+
+            $("#submit_btn").click(function() {
+                console.log("submit");
+                if (!msgBox.val()) {
+                    return false;
+                }
+
+                if (!socket) {
+                    alert("No connection");
+                    return false;
+                }
+
+                socket.send(msgBox.val());
+                msgBox.val("");
+                return false;
+            });
+
+            if (!window["WebSocket"]) {
+                alert("This browser is not support WebSocket.");
+            } else {
+                console.log("init");
+                socket = new WebSocket("ws://localhost:8080/room");
+                socket.onclose = function() {
+                    alert("disconnected");
+                }
+                socket.onmessage = function(e) {
+                    messages.append($("<li>").text(e.data));
+                }
+            }
+        });
+    </script>
 </body>
 </html>
