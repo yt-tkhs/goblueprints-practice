@@ -1,7 +1,21 @@
 package trace
 
-import "testing"
+import (
+	"testing"
+	"bytes"
+)
 
 func TestNew(t *testing.T) {
-	t.Error("Test has not been created.")
+	var buf bytes.Buffer
+
+	tracer := New(&buf)
+
+	if tracer == nil {
+		t.Error("return value from new() is nil.")
+	} else {
+		tracer.Trace("Hello, trace package")
+		if buf.String() != "Hello, trace package\n" {
+			t.Errorf("wrong value '%s' is outed", buf.String())
+		}
+	}
 }
