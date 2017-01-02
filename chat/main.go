@@ -2,10 +2,11 @@ package main
 
 import (
 	"net/http"
-	"github.com/labstack/gommon/log"
 	"sync"
 	"text/template"
 	"path/filepath"
+	"flag"
+	"log"
 )
 
 type templateHandler struct {
@@ -14,15 +15,19 @@ type templateHandler struct {
 	templ       *template.Template
 }
 
+var address = flag.String("address", ":8080", "address of application")
+
 // Process HTTP Request
 func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.fileName)))
 	})
-	t.templ.Execute(w, nil)
+	t.templ.Execute(w, r)
 }
 
 func main() {
+	flag.Parse()
+
 	r := newRoom()
 
 	// When you access http://localhost:8080/, following function is executed.
@@ -32,7 +37,8 @@ func main() {
 	go r.run()
 
 	// Start Web Server
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Starting web server (port:", *address, ")")
+	if err := http.ListenAndServe(*address, nil); err != nil {
 		log.Fatal("ListenAndServer: ", err)
 	}
 }
