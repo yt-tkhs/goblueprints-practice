@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"net/http"
 	"github.com/labstack/gommon/log"
+	"trace"
 )
 
 type room struct {
@@ -21,6 +22,9 @@ type room struct {
 
 	// history of message
 	messages [][]byte
+
+	// tracer
+	tracer trace.Tracer
 }
 
 func newRoom() *room {
@@ -77,20 +81,25 @@ func (r *room) run() {
 		case client := <-r.join:
 			// joining
 			r.clients[client] = true
+			r.tracer.Trace("Joined new client.")
 		case client := <-r.leave:
 			// leaving
 			delete(r.clients, client)
 			close(client.send)
+			r.tracer.Trace("Left a client.")
 		case msg := <-r.forward:
+			r.tracer.Trace("Received new message: ", string(msg))
 			r.addHistory(msg)
 			for client := range r.clients {
 				select {
 				case client.send <- msg:
 					// メッセージを送信
+				r.tracer.Trace("-- Complete sending message to client")
 				default:
 					// 送信に失敗したクライアントは退室させる
 					delete(r.clients, client)
 					close(client.send)
+					r.tracer.Trace("-- Failed to send message to client, clean up the client.")
 				}
 			}
 		}
