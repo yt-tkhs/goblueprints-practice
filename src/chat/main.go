@@ -44,8 +44,8 @@ func main() {
 	gomniauth.SetSecurityKey("test-security-key")
 	gomniauth.WithProviders(
 		google.New(
-			"686923727320-dm8goejvsbmh0pmujt4j5nc0q0t6228c.apps.googleusercontent.com",
-			"J7WJX81SJ7muppIQzYdvEY7S",
+			"",
+			"",
 			"http://localhost:8080/auth/callback/google"),
 	)
 
