@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"github.com/labstack/gommon/log"
 	"trace"
+	"github.com/stretchr/objx"
 )
 
 type room struct {
 	// channel that holds messages for transfer to other clients.
-	forward chan []byte
+	forward chan *message
 
 	// client trying to join
 	join    chan *client
@@ -21,7 +22,7 @@ type room struct {
 	clients map[*client]bool
 
 	// history of message
-	messages [][]byte
+	messages []message
 
 	// tracer
 	tracer trace.Tracer
@@ -29,11 +30,11 @@ type room struct {
 
 func newRoom() *room {
 	return &room {
-		forward: make(chan []byte),
+		forward: make(chan *message),
 		join:    make(chan *client),
 		leave:   make(chan *client),
 		clients: make(map[*client]bool),
-		messages:make([][]byte, 0, 10000),
+		messages:make([]message, 0, 10000),
 	}
 }
 
@@ -54,15 +55,22 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	authCookie, err := req.Cookie("auth")
+	if err != nil {
+		log.Fatal("ServeHTTP:", err)
+		return
+	}
+
 	client := &client {
 		socket: socket,
-		send: make(chan []byte, messageBufferSize),
+		send: make(chan *message, messageBufferSize),
 		room: r,
+		userData: objx.MustFromBase64(authCookie.Value),
 	}
 
 	// send past messages
 	for _, msg := range r.messages {
-		client.send <- msg
+		client.send <- &msg
 	}
 
 	r.join <- client
@@ -88,7 +96,7 @@ func (r *room) run() {
 			close(client.send)
 			r.tracer.Trace("Left a client.")
 		case msg := <-r.forward:
-			r.tracer.Trace("Received new message: ", string(msg))
+			r.tracer.Trace("Received new message: ", msg.Message)
 			r.addHistory(msg)
 			for client := range r.clients {
 				select {
@@ -106,6 +114,6 @@ func (r *room) run() {
 	}
 }
 
-func (r *room) addHistory(msg []byte)  {
-	r.messages = append(r.messages, msg)
+func (r *room) addHistory(msg *message)  {
+	r.messages = append(r.messages, *msg)
 }
