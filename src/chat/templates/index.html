@@ -3,14 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <title>Chat</title>
-  <style>
-        input { display: block; }
-        ul { list-stlye: none; }
 
-  </style>
+  <style type="text/css">
+  .linear-horizontal {
+    display: flex;
+    flex-direction: row;
+
+    // for Safari
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+  }
+
+  .linear-horizontal-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    // for Safari
+    display: -webkit-flex;
+    -webkit-flex-direction: row;
+    -webkit-align-items: center;
+  }
+
+  .message-box {
+    margin-top: 8px;
+  }
+
+  .message-text {
+    flex: 1;
+    word-wrap: break-word;
+    min-width: 80px;
+  }
+
+  .profile-img {
+    min-width: 50px;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 4px;        /* CSS3草案 */
+    -webkit-border-radius: 4px;    /* Safari,Google Chrome用 */
+    -moz-border-radius: 4px;   /* Firefox用 */
+  }
+
+  .profile-img img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: 100%;
+    margin-right: 8px;
+  }
+
+  .name-message {
+    padding-left: 8px;
+  }
+
+  .username {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .sent-date {
+    margin-left: 4px;
+    font-size: 12px;
+  }
+</style>
+
 </head>
 <body>
-<ul id="messages"></ul>
+<div class="messages"></div>
 Chat app using WebSocket
 <form id="chatbox">
   {{.UserData.name}}:<br/>
@@ -24,7 +89,7 @@ Chat app using WebSocket
         $(function() {
             var socket = null;
             var msgBox = $("#chatbox textarea");
-            var messages = $("#messages");
+            var messages = $(".messages");
 
             $("#test_btn").click(function() {
                 console.log("test");
@@ -65,10 +130,19 @@ Chat app using WebSocket
                     var date = new Date(msg.CreatedAt * 1000)
 
                     messages.append(
-                        $("<li>").append(
-                            $("<strong>").text(msg.Name + ": "),
-                            $("<span>").text(msg.Message + "(" + formatDate(date, "YYYY-MM-DD hh:mm") + ")")
+                        $('<div class="message-box linear-horizontal">').append(
+                          $('<div class="profile-img">').append(
+                            $('<img src="http://blamethemonkey.com/wp-content/uploads/2014/06/Elia-Locardi-Travel-Photograhy-The-Soul-of-Kyoto-Japan-1440-60q.jpg">')
+                          ),
 
+                          $('<div class="name-message">').append(
+                            $('<div class="linear-horizontal-center">').append(
+                              $('<div class="username">').text(msg.Name),
+                              $('<div class="sent-date">').text(formatDate(date, "YYYY-MM-DD hh:mm"))
+                            ),
+
+                            $('<div class="message-text">').text(msg.Message)
+                          )
                         )
                     );
                 }
@@ -93,5 +167,6 @@ Chat app using WebSocket
           return format;
         };
 </script>
+
 </body>
 </html>

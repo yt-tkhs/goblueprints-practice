@@ -22,7 +22,7 @@ type room struct {
 	clients map[*client]bool
 
 	// history of message
-	messages []message
+	messages []*message
 
 	// tracer
 	tracer trace.Tracer
@@ -34,7 +34,7 @@ func newRoom() *room {
 		join:    make(chan *client),
 		leave:   make(chan *client),
 		clients: make(map[*client]bool),
-		messages:make([]message, 0, 10000),
+		messages:make([]*message, 0, 10000),
 	}
 }
 
@@ -70,7 +70,7 @@ func (r *room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// send past messages
 	for _, msg := range r.messages {
-		client.send <- &msg
+		client.send <- msg
 	}
 
 	r.join <- client
@@ -115,5 +115,5 @@ func (r *room) run() {
 }
 
 func (r *room) addHistory(msg *message)  {
-	r.messages = append(r.messages, *msg)
+	r.messages = append(r.messages, msg)
 }
