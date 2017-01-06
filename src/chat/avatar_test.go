@@ -1,23 +1,31 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"path/filepath"
+	"io/ioutil"
+	"os"
+	"github.com/stretchr/gomniauth/test"
+)
 
 func TestAuthAvatar(t *testing.T) {
 	var authAvatar AuthAvatar
-	client := new(client)
 
-	url, err := authAvatar.GetAvatarURL(client)
+	testUser := &test.TestUser{}
+	testUser.On("AvatarURL").Return("", ErrNoAvatarURL)
 
+	testChatUser := &chatUser{User: testUser}
+
+	url, err := authAvatar.GetAvatarURL(testChatUser)
 	if err != ErrNoAvatarURL {
 		t.Error("Should return ErrNoAvatarURL if url is empty.")
 	}
 
-	testUrl := "http://url-to-avatar.com"
-	client.userData = map[string]interface{} {
-		"avatar_url": testUrl,
-	}
-
-	url, err = authAvatar.GetAvatarURL(client)
+	testUrl := "http://url-to-avatar/"
+	testUser = &test.TestUser{}
+	testChatUser.User = testUser
+	testUser.On("AvatarURL").Return(testUrl, nil)
+	url, err = authAvatar.GetAvatarURL(testChatUser)
 	if err != nil {
 		t.Error("Should not return an error if url is not empty.")
 	} else {
@@ -29,17 +37,33 @@ func TestAuthAvatar(t *testing.T) {
 
 func TestGravatarAvatar(t *testing.T) {
 	var gravatarAvatar GravatarAvatar
-	client := new(client)
-	client.userData = map[string]interface{} {
-		"email": "MyEmailAddress@example.com",
-	}
+	user := &chatUser{uniqueID: "abc"}
 
-	url, err := gravatarAvatar.GetAvatarURL(client)
+	url, err := gravatarAvatar.GetAvatarURL(user)
 	if err != nil {
 		t.Error("GravatarAvatar.GetAvatarURL should not return error.")
 	}
 
-	if url != "//www.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346" {
+	if url != "//www.gravatar.com/avatar/abc" {
 		t.Errorf("GravatarAvatar.GetAvatarURL returns wrong url '%s'.", url)
+	}
+}
+
+func TestFileSystemAvatar(t *testing.T) {
+	fileName := filepath.Join("avatars", "abc.jpg")
+	ioutil.WriteFile(fileName, []byte{}, 0777)
+	defer func() { os.Remove(fileName) }()
+
+	var fileSystemAvatar FileSystemAvatar
+	user := &chatUser{uniqueID: "abc"}
+
+	url, err := fileSystemAvatar.GetAvatarURL(user)
+
+	if err != nil {
+		t.Error("FileSystemAvatar.GetAvatarURL should not return error.")
+	}
+
+	if url != "/avatars/abc.jpg" {
+		t.Errorf("FileSystemAvatar.GetAvatarURL returns wrong url '%s'", url)
 	}
 }

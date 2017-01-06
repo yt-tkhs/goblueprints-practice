@@ -26,12 +26,9 @@ type room struct {
 
 	// tracer
 	tracer trace.Tracer
-
-	// method of fetching avatar
-	avatar Avatar
 }
 
-func newRoom(avatar Avatar) *room {
+func newRoom() *room {
 	return &room {
 		forward:    make(chan *message),
 		join:       make(chan *client),
@@ -39,7 +36,6 @@ func newRoom(avatar Avatar) *room {
 		clients:    make(map[*client]bool),
 		messages:   make([]*message, 0, 10000),
 		tracer:     trace.Off(),
-		avatar:     avatar,
 	}
 }
 
