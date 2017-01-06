@@ -132,13 +132,13 @@ Chat app using WebSocket
                     messages.append(
                         $('<div class="message-box linear-horizontal">').append(
                           $('<div class="profile-img">').append(
-                            $('<img src="http://blamethemonkey.com/wp-content/uploads/2014/06/Elia-Locardi-Travel-Photograhy-The-Soul-of-Kyoto-Japan-1440-60q.jpg">')
+                            $('<img>').attr("src", msg.AvatarURL)
                           ),
 
                           $('<div class="name-message">').append(
                             $('<div class="linear-horizontal-center">').append(
                               $('<div class="username">').text(msg.Name),
-                              $('<div class="sent-date">').text(formatDate(date, "YYYY-MM-DD hh:mm"))
+                              $('<div class="sent-date">').text(formatDate(date, "hh:mm"))
                             ),
 
                             $('<div class="message-text">').text(msg.Message)

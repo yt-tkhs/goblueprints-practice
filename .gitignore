@@ -1,3 +1,5 @@
 .idea/
 *.iml
-practice/
+src/practice
+src/chat/credential.go
+src/chat/chat
