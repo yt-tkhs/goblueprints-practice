@@ -49,7 +49,7 @@ func main() {
 			"http://localhost:8080/auth/callback/google"),
 	)
 
-	r := newRoom()
+	r := newRoom(UseAuthAvatar)
 	r.tracer = trace.New(os.Stdout)
 
 	// When you access http://localhost:8080/, following function is executed.

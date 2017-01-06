@@ -21,11 +21,9 @@ func (c *client) read() {
 			return
 		}
 
-		msg.CreatedAt = time.Now().Unix()
 		msg.Name = c.userData["name"].(string)
-		if avatarURL, ok := c.userData["avatar_url"]; ok {
-			msg.AvatarURL = avatarURL.(string)
-		}
+		msg.CreatedAt = time.Now().Unix()
+		msg.AvatarURL, _ = c.room.avatar.GetAvatarURL(c)
 		c.room.forward <- msg
 	}
 }
