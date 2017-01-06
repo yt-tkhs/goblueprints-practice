@@ -5,3 +5,4 @@ src/chat/credential.go
 src/chat/chat
 src/cmdtool/sprinkle/sprinkle
 src/cmdtool/domainify/domainify
+src/cmdtool/coolify/coolify
