@@ -99,8 +99,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatalln("Failed to fetch user. :", provider, "-", err)
 		}
 
-		chatUser := &chatUser{User: user}
-		chatUser.uniqueID = ToMD5(user.Email())
+		chatUser := &chatUser{
+			User:       user,
+			uniqueID:   ToMD5(user.Email()),
+		}
 		avatarURL, err := avatars.GetAvatarURL(chatUser)
 		if err != nil {
 			log.Fatalln("Failed to GetAvatarURL - ", err)
