@@ -6,12 +6,14 @@ import (
 	"bufio"
 	"os"
 	"fmt"
+	"path/filepath"
 )
 
 var transforms = make([]string, 0)
 
 func main() {
-	fileName := "res/additional_word.txt"
+	path, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	fileName := path + "/res/additional_word.txt"
 	fp, err := os.Open(fileName)
 	defer fp.Close()
 
