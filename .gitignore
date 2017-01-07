@@ -6,3 +6,5 @@ src/chat/chat
 src/cmdtool/sprinkle/sprinkle
 src/cmdtool/domainify/domainify
 src/cmdtool/coolify/coolify
+src/socialpoll/twittervotes/twittervotes
+src/socialpoll/twittervotes/key.go
