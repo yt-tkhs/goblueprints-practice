@@ -9,3 +9,5 @@ src/cmdtool/coolify/coolify
 src/socialpoll/twittervotes/twittervotes
 src/socialpoll/twittervotes/key.go
 src/socialpoll/counter/counter
+src/socialpoll/api/api
+src/socialpoll/api_echo/api_echo
